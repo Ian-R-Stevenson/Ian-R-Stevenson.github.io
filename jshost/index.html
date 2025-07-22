@@ -5,6 +5,115 @@
     <meta name="generator" content="BBEdit 14.6" />
 </head>
 <body>
-Hello from jshost
+<div id="graph" style="width:100%; height:600px; border:1px solid #ccc;"></div>
+<script src="https://cdn.jsdelivr.net/npm/viz.js@2.1.2/viz.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/viz.js@2.1.2/full.render.js"></script>
+<script>
+  const dot = `digraph MusicAI {
+    rankdir=LR;
+    node [shape=box];
+ "Music and Audio AI" -> "Music Generation Research and Experimental";
+    "Music and Audio AI" -> "Music Generation Commercial";
+    "Music and Audio AI" -> "Music Generation Functional and Therapeutic";
+    "Music and Audio AI" -> "Music Generation for Games";
+    "Music and Audio AI" -> "Text to Speech";
+    "Music and Audio AI" -> "Text to SFX";
+    "Music and Audio AI" -> "Source Separation";
+    "Music and Audio AI" -> "Transcription";
+    "Music and Audio AI" -> "Ear Training";
+    "Music and Audio AI" -> "Content Identification";
+    "Music and Audio AI" -> "Mastering";
+    "Music and Audio AI" -> "Production Tools";
+    "Music and Audio AI" -> "Voice Replacement";
+    "Music and Audio AI" -> "Recommendation Engines";
+
+    "Music Generation Research and Experimental" -> "OpenAI MuseNet";
+    "Music Generation Research and Experimental" -> "GoogleLabs MusicFX";
+    "Music Generation Research and Experimental" -> "FluComa";
+
+    "Music Generation Commercial" -> "Suno";
+    "Music Generation Commercial" -> "Google Vertex AI Lyria";
+    "Music Generation Commercial" -> "AI Songs";
+    "Music Generation Commercial" -> "Mureka";
+    "Music Generation Commercial" -> "Epidemic Sound";
+    "Music Generation Commercial" -> "aimusic.fm";
+    "Music Generation Commercial" -> "soundraw.io";
+    "Music Generation Commercial" -> "Udio";
+    "Music Generation Commercial" -> "Soundful";
+    "Music Generation Commercial" -> "infinitealbum.io";
+
+    "Music Generation Functional and Therapeutic" -> "endel.io";
+    "Music Generation Functional and Therapeutic" -> "aimi.fm";
+
+    "Music Generation for Games" -> "infinitealbum.io";
+
+    "Text to Speech" -> "Murf.ai";
+    "Text to Speech" -> "Eleven Labs";
+    "Text to Speech" -> "Speechify";
+    "Text to Speech" -> "Hume.ai";
+    "Text to Speech" -> "Voice.ai";
+    "Text to Speech" -> "Text to Singing Voice";
+
+    "Text to Singing Voice" -> "Acestudio";
+    "Text to Singing Voice" -> "Sudimee";
+
+    "Text to SFX" -> "Eleven Labs";
+    "Text to SFX" -> "SFX Engine";
+
+    "Voice Replacement" -> "Eleven Labs";
+    "Voice Replacement" -> "Lalal.ai";
+    "Voice Replacement" -> "Voice.ai";
+    "Voice Replacement" -> "Murf.ai";
+
+    "Source Separation" -> "Fadr";
+    "Source Separation" -> "eMastered";
+    "Source Separation" -> "Lalal.ai";
+    "Source Separation" -> "Voice.ai";
+    "Source Separation" -> "Gaudio";
+    "Source Separation" -> "Kits.ai";
+
+    "Transcription" -> "klang.io";
+    "Transcription" -> "Ableton Live";
+    "Transcription" -> "AnthemScore";
+
+    "Ear Training" -> "Ella";
+    "Ear Training" -> "Intellear";
+    "Ear Training" -> "Earmaster";
+
+    "Content Identification" -> "Resemble.ai";
+    "Content Identification" -> "Google ContentID";
+    "Content Identification" -> "Shazam";
+    "Content Identification" -> "Sound Hound";
+
+    "Mastering" -> "Landr";
+    "Mastering" -> "Waves Online Mastering";
+    "Mastering" -> "eMastered";
+    "Mastering" -> "aimastering";
+    "Mastering" -> "Munute";
+    "Mastering" -> "Masterchannel.ai";
+
+    "Production Tools" -> "Waves Curves AQ";
+    "Production Tools" -> "Waves Sync VX";
+    "Production Tools" -> "WavesDeReverb";
+    "Production Tools" -> "iZotope RX";
+    "Production Tools" -> "iZotope Neutron";
+    "Production Tools" -> "iZotope Ozone";
+    "Production Tools" -> "iZotope VEA";
+    "Production Tools" -> "Adobe Premiere Enhance Speech";
+
+    "Recommendation Engines" -> "Spotify";
+    "Recommendation Engines" -> "Apple Music";
+  }`;
+
+  const viz = new Viz();
+  viz.renderSVGElement(dot)
+    .then(function(element) {
+      document.getElementById("graph").appendChild(element);
+    })
+    .catch(error => {
+      document.getElementById("graph").innerHTML = '<p>Error rendering graph</p>';
+      console.error(error);
+    });
+</script>
 </body>
 </html>
