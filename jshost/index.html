@@ -6,8 +6,7 @@
   <title>Music and Audio AI Tree</title>
   <style>
     .node circle {
-      fill: #999;
-      stroke: steelblue;
+      stroke: #000;
       stroke-width: 1.5px;
     }
     .node text {
@@ -18,6 +17,9 @@
       stroke: #555;
       stroke-opacity: 0.4;
       stroke-width: 1.5px;
+    }
+    svg {
+      border: 1px solid #ccc;
     }
   </style>
 </head>
@@ -30,25 +32,32 @@ const data = {"name": "Music and Audio AI", "children": [{"name": "Music Generat
 const width = 1200;
 const height = 800;
 
-const treeLayout = d3.tree().size([height, width - 160]);
-const root = d3.hierarchy(data);
-
-treeLayout(root);
-
 const svg = d3.select("#tree-container")
   .append("svg")
   .attr("width", width)
-  .attr("height", height)
-  .append("g")
-  .attr("transform", "translate(80,0)");
+  .attr("height", height);
+
+const g = svg.append("g").attr("transform", "translate(80,0)");
+
+const zoom = d3.zoom()
+  .scaleExtent([0.5, 3])
+  .on("zoom", (event) => {
+    g.attr("transform", event.transform);
+  });
+
+svg.call(zoom);
+
+const treeLayout = d3.tree().size([height, width - 160]);
+const root = d3.hierarchy(data);
+treeLayout(root);
 
 function update(source) {
   const nodes = root.descendants();
   const links = root.links();
 
-  svg.selectAll("*").remove();
+  g.selectAll("*").remove();
 
-  svg.selectAll(".link")
+  g.selectAll(".link")
     .data(links)
     .join("path")
     .attr("class", "link")
@@ -56,7 +65,7 @@ function update(source) {
       .x(function(d) { return d.y; })
       .y(function(d) { return d.x; }));
 
-  const node = svg.selectAll(".node")
+  const node = g.selectAll(".node")
     .data(nodes)
     .join("g")
     .attr("class", "node")
@@ -66,11 +75,16 @@ function update(source) {
       update(d);
     });
 
-  node.append("circle").attr("r", 6);
+  node.append("circle")
+    .attr("r", 6)
+    .style("fill", function(d) {
+      return d._children || d.children ? "green" : "blue";
+    });
+
   node.append("text")
     .attr("dy", 3)
-    .attr("x", function(d) { return d.children ? -10 : 10; })
-    .style("text-anchor", function(d) { return d.children ? "end" : "start"; })
+    .attr("x", function(d) { return d.children || d._children ? -10 : 10; })
+    .style("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
     .text(function(d) { return d.data.name; });
 }
 
