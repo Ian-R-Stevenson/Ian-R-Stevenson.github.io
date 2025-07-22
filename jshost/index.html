@@ -1,119 +1,87 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>jshost</title>
-    <meta name="generator" content="BBEdit 14.6" />
+  <meta charset="UTF-8">
+  <title>Music and Audio AI Tree</title>
+  <style>
+    .node circle {
+      fill: #999;
+      stroke: steelblue;
+      stroke-width: 1.5px;
+    }
+    .node text {
+      font: 12px sans-serif;
+    }
+    .link {
+      fill: none;
+      stroke: #555;
+      stroke-opacity: 0.4;
+      stroke-width: 1.5px;
+    }
+  </style>
 </head>
 <body>
-<div id="graph" style="width:100%; height:600px; border:1px solid #ccc;"></div>
-<script src="https://cdn.jsdelivr.net/npm/viz.js@2.1.2/viz.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/viz.js@2.1.2/full.render.js"></script>
+<div id="tree-container"></div>
+<script src="https://d3js.org/d3.v7.min.js"></script>
 <script>
-  const dot = `digraph MusicAI {
-    rankdir=LR;
-    node [shape=box];
- "Music and Audio AI" -> "Music Generation Research and Experimental";
-    "Music and Audio AI" -> "Music Generation Commercial";
-    "Music and Audio AI" -> "Music Generation Functional and Therapeutic";
-    "Music and Audio AI" -> "Music Generation for Games";
-    "Music and Audio AI" -> "Text to Speech";
-    "Music and Audio AI" -> "Text to SFX";
-    "Music and Audio AI" -> "Source Separation";
-    "Music and Audio AI" -> "Transcription";
-    "Music and Audio AI" -> "Ear Training";
-    "Music and Audio AI" -> "Content Identification";
-    "Music and Audio AI" -> "Mastering";
-    "Music and Audio AI" -> "Production Tools";
-    "Music and Audio AI" -> "Voice Replacement";
-    "Music and Audio AI" -> "Recommendation Engines";
+const data = {"name": "Music and Audio AI", "children": [{"name": "Music Generation Research and Experimental", "children": [{"name": "OpenAI MuseNet"}, {"name": "GoogleLabs MusicFX"}, {"name": "FluComa"}]}, {"name": "Music Generation Commercial", "children": [{"name": "Suno"}, {"name": "Google Vertex AI Lyria"}, {"name": "AI Songs"}, {"name": "Mureka"}, {"name": "Epidemic Sound"}, {"name": "aimusic.fm"}, {"name": "soundraw.io"}, {"name": "Udio"}, {"name": "Soundful"}, {"name": "infinitealbum.io"}]}, {"name": "Music Generation Functional and Therapeutic", "children": [{"name": "endel.io"}, {"name": "aimi.fm"}]}, {"name": "Music Generation for Games", "children": [{"name": "infinitealbum.io"}]}, {"name": "Text to Speech", "children": [{"name": "Murf.ai"}, {"name": "Eleven Labs"}, {"name": "Speechify"}, {"name": "Hume.ai"}, {"name": "Voice.ai"}, {"name": "Text to Singing Voice", "children": [{"name": "Acestudio"}, {"name": "Sudimee"}]}]}, {"name": "Text to SFX", "children": [{"name": "Eleven Labs"}, {"name": "SFX Engine"}]}, {"name": "Source Separation", "children": [{"name": "Fadr"}, {"name": "eMastered"}, {"name": "Lalal.ai"}, {"name": "Voice.ai"}, {"name": "Gaudio"}, {"name": "Kits.ai"}]}, {"name": "Transcription", "children": [{"name": "klang.io"}, {"name": "Ableton Live"}, {"name": "AnthemScore"}]}, {"name": "Ear Training", "children": [{"name": "Ella"}, {"name": "Intellear"}, {"name": "Earmaster"}]}, {"name": "Content Identification", "children": [{"name": "Resemble.ai"}, {"name": "Google ContentID"}, {"name": "Shazam"}, {"name": "Sound Hound"}]}, {"name": "Mastering", "children": [{"name": "Landr"}, {"name": "Waves Online Mastering"}, {"name": "eMastered"}, {"name": "aimastering"}, {"name": "Munute"}, {"name": "Masterchannel.ai"}]}, {"name": "Production Tools", "children": [{"name": "Waves Curves AQ"}, {"name": "Waves Sync VX"}, {"name": "WavesDeReverb"}, {"name": "iZotope RX"}, {"name": "iZotope Neutron"}, {"name": "iZotope Ozone"}, {"name": "iZotope VEA"}, {"name": "Adobe Premiere Enhance Speech"}]}, {"name": "Voice Replacement", "children": [{"name": "Eleven Labs"}, {"name": "Lalal.ai"}, {"name": "Voice.ai"}, {"name": "Murf.ai"}]}, {"name": "Recommendation Engines", "children": [{"name": "Spotify"}, {"name": "Apple Music"}]}]};
 
-    "Music Generation Research and Experimental" -> "OpenAI MuseNet";
-    "Music Generation Research and Experimental" -> "GoogleLabs MusicFX";
-    "Music Generation Research and Experimental" -> "FluComa";
+const width = 1200;
+const height = 800;
 
-    "Music Generation Commercial" -> "Suno";
-    "Music Generation Commercial" -> "Google Vertex AI Lyria";
-    "Music Generation Commercial" -> "AI Songs";
-    "Music Generation Commercial" -> "Mureka";
-    "Music Generation Commercial" -> "Epidemic Sound";
-    "Music Generation Commercial" -> "aimusic.fm";
-    "Music Generation Commercial" -> "soundraw.io";
-    "Music Generation Commercial" -> "Udio";
-    "Music Generation Commercial" -> "Soundful";
-    "Music Generation Commercial" -> "infinitealbum.io";
+const treeLayout = d3.tree().size([height, width - 160]);
+const root = d3.hierarchy(data);
 
-    "Music Generation Functional and Therapeutic" -> "endel.io";
-    "Music Generation Functional and Therapeutic" -> "aimi.fm";
+treeLayout(root);
 
-    "Music Generation for Games" -> "infinitealbum.io";
+const svg = d3.select("#tree-container")
+  .append("svg")
+  .attr("width", width)
+  .attr("height", height)
+  .append("g")
+  .attr("transform", "translate(80,0)");
 
-    "Text to Speech" -> "Murf.ai";
-    "Text to Speech" -> "Eleven Labs";
-    "Text to Speech" -> "Speechify";
-    "Text to Speech" -> "Hume.ai";
-    "Text to Speech" -> "Voice.ai";
-    "Text to Speech" -> "Text to Singing Voice";
+function update(source) {
+  const nodes = root.descendants();
+  const links = root.links();
 
-    "Text to Singing Voice" -> "Acestudio";
-    "Text to Singing Voice" -> "Sudimee";
+  svg.selectAll("*").remove();
 
-    "Text to SFX" -> "Eleven Labs";
-    "Text to SFX" -> "SFX Engine";
+  svg.selectAll(".link")
+    .data(links)
+    .join("path")
+    .attr("class", "link")
+    .attr("d", d3.linkHorizontal()
+      .x(function(d) { return d.y; })
+      .y(function(d) { return d.x; }));
 
-    "Voice Replacement" -> "Eleven Labs";
-    "Voice Replacement" -> "Lalal.ai";
-    "Voice Replacement" -> "Voice.ai";
-    "Voice Replacement" -> "Murf.ai";
-
-    "Source Separation" -> "Fadr";
-    "Source Separation" -> "eMastered";
-    "Source Separation" -> "Lalal.ai";
-    "Source Separation" -> "Voice.ai";
-    "Source Separation" -> "Gaudio";
-    "Source Separation" -> "Kits.ai";
-
-    "Transcription" -> "klang.io";
-    "Transcription" -> "Ableton Live";
-    "Transcription" -> "AnthemScore";
-
-    "Ear Training" -> "Ella";
-    "Ear Training" -> "Intellear";
-    "Ear Training" -> "Earmaster";
-
-    "Content Identification" -> "Resemble.ai";
-    "Content Identification" -> "Google ContentID";
-    "Content Identification" -> "Shazam";
-    "Content Identification" -> "Sound Hound";
-
-    "Mastering" -> "Landr";
-    "Mastering" -> "Waves Online Mastering";
-    "Mastering" -> "eMastered";
-    "Mastering" -> "aimastering";
-    "Mastering" -> "Munute";
-    "Mastering" -> "Masterchannel.ai";
-
-    "Production Tools" -> "Waves Curves AQ";
-    "Production Tools" -> "Waves Sync VX";
-    "Production Tools" -> "WavesDeReverb";
-    "Production Tools" -> "iZotope RX";
-    "Production Tools" -> "iZotope Neutron";
-    "Production Tools" -> "iZotope Ozone";
-    "Production Tools" -> "iZotope VEA";
-    "Production Tools" -> "Adobe Premiere Enhance Speech";
-
-    "Recommendation Engines" -> "Spotify";
-    "Recommendation Engines" -> "Apple Music";
-  }`;
-
-  const viz = new Viz();
-  viz.renderSVGElement(dot)
-    .then(function(element) {
-      document.getElementById("graph").appendChild(element);
-    })
-    .catch(error => {
-      document.getElementById("graph").innerHTML = '<p>Error rendering graph</p>';
-      console.error(error);
+  const node = svg.selectAll(".node")
+    .data(nodes)
+    .join("g")
+    .attr("class", "node")
+    .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
+    .on("click", function(event, d) {
+      d.children = d.children ? null : d._children;
+      update(d);
     });
+
+  node.append("circle").attr("r", 6);
+  node.append("text")
+    .attr("dy", 3)
+    .attr("x", function(d) { return d.children ? -10 : 10; })
+    .style("text-anchor", function(d) { return d.children ? "end" : "start"; })
+    .text(function(d) { return d.data.name; });
+}
+
+root.descendants().forEach(function(d) {
+  if (d.children) {
+    d._children = d.children;
+    d.children = null;
+  }
+});
+
+update(root);
 </script>
 </body>
 </html>
