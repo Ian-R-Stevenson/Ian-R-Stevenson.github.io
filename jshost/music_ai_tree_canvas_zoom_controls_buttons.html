@@ -1,0 +1,177 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Music and Audio AI Tree</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0 1rem;
+    }
+    #controls {
+      margin: 1rem 0;
+    }
+    #controls button {
+      margin-right: 0.5rem;
+      padding: 0.4rem 0.8rem;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .node circle {
+      stroke: #000;
+      stroke-width: 1.5px;
+    }
+    .node text {
+      font: 12px sans-serif;
+    }
+    .link {
+      fill: none;
+      stroke: #555;
+      stroke-opacity: 0.4;
+      stroke-width: 1.5px;
+    }
+    svg {
+      border: 1px solid #ccc;
+      width: 100%;
+      height: 800px;
+    }
+  </style>
+</head>
+<body>
+<h1>Music & Audio AI Interactive Tree</h1>
+<div id="controls">
+  <button id="expandAllBtn" type="button">Expand All</button>
+  <button id="collapseAllBtn" type="button">Collapse All</button>
+  <button id="resetZoomBtn" type="button">Reset View</button>
+</div>
+<div id="tree-container"></div>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+const data = {"name": "Music and Audio AI", "children": [{"name": "Music Generation Research and Experimental", "children": [{"name": "OpenAI MuseNet"}, {"name": "GoogleLabs MusicFX"}, {"name": "FluComa"}]}, {"name": "Music Generation Commercial", "children": [{"name": "Suno"}, {"name": "Google Vertex AI Lyria"}, {"name": "AI Songs"}, {"name": "Mureka"}, {"name": "Epidemic Sound"}, {"name": "aimusic.fm"}, {"name": "soundraw.io"}, {"name": "Udio"}, {"name": "Soundful"}, {"name": "infinitealbum.io"}]}, {"name": "Music Generation Functional and Therapeutic", "children": [{"name": "endel.io"}, {"name": "aimi.fm"}]}, {"name": "Music Generation for Games", "children": [{"name": "infinitealbum.io"}]}, {"name": "Text to Speech", "children": [{"name": "Murf.ai"}, {"name": "Eleven Labs"}, {"name": "Speechify"}, {"name": "Hume.ai"}, {"name": "Voice.ai"}, {"name": "Text to Singing Voice", "children": [{"name": "Acestudio"}, {"name": "Sudimee"}]}]}, {"name": "Text to SFX", "children": [{"name": "Eleven Labs"}, {"name": "SFX Engine"}]}, {"name": "Source Separation", "children": [{"name": "Fadr"}, {"name": "eMastered"}, {"name": "Lalal.ai"}, {"name": "Voice.ai"}, {"name": "Gaudio"}, {"name": "Kits.ai"}]}, {"name": "Transcription", "children": [{"name": "klang.io"}, {"name": "Ableton Live"}, {"name": "AnthemScore"}]}, {"name": "Ear Training", "children": [{"name": "Ella"}, {"name": "Intellear"}, {"name": "Earmaster"}]}, {"name": "Content Identification", "children": [{"name": "Resemble.ai"}, {"name": "Google ContentID"}, {"name": "Shazam"}, {"name": "Sound Hound"}]}, {"name": "Mastering", "children": [{"name": "Landr"}, {"name": "Waves Online Mastering"}, {"name": "eMastered"}, {"name": "aimastering"}, {"name": "Munute"}, {"name": "Masterchannel.ai"}]}, {"name": "Production Tools", "children": [{"name": "Waves Curves AQ"}, {"name": "Waves Sync VX"}, {"name": "WavesDeReverb"}, {"name": "iZotope RX"}, {"name": "iZotope Neutron"}, {"name": "iZotope Ozone"}, {"name": "iZotope VEA"}, {"name": "Adobe Premiere Enhance Speech"}]}, {"name": "Voice Replacement", "children": [{"name": "Eleven Labs"}, {"name": "Lalal.ai"}, {"name": "Voice.ai"}, {"name": "Murf.ai"}]}, {"name": "Recommendation Engines", "children": [{"name": "Spotify"}, {"name": "Apple Music"}]}]};
+
+// Initial dimensions (svg is responsive width via CSS; height fixed in CSS)
+const width = 1200;
+const height = 800;
+
+// Create SVG and zoom group
+const svg = d3.select("#tree-container")
+  .append("svg")
+  .attr("viewBox", [0, 0, width, height].join(" "))
+  .attr("preserveAspectRatio", "xMinYMin meet");
+
+const g = svg.append("g").attr("transform", "translate(80,0)");
+
+// Zoom / Pan
+const zoom = d3.zoom()
+  .scaleExtent([0.25, 4])
+  .on("zoom", (event) => {
+    g.attr("transform", event.transform);
+  });
+
+svg.call(zoom);
+
+// Layout + data
+const treeLayout = d3.tree().size([height, width - 160]);
+const root = d3.hierarchy(data);
+
+// Collapse all descendants (default collapsed)
+root.descendants().forEach(d => {
+  if (d.children) {
+    d._children = d.children;
+    d.children = null;
+  }
+});
+
+// Render
+function update(source) {
+  // Compute new layout each time in case structure changed
+  treeLayout(root);
+  const nodes = root.descendants();
+  const links = root.links();
+
+  g.selectAll("*").remove();
+
+  // Links
+  g.selectAll(".link")
+    .data(links)
+    .join("path")
+    .attr("class", "link")
+    .attr("d", d3.linkHorizontal()
+      .x(d => d.y)
+      .y(d => d.x));
+
+  // Nodes
+  const node = g.selectAll(".node")
+    .data(nodes, d => d.data.name)
+    .join("g")
+    .attr("class", "node")
+    .attr("transform", d => "translate(" + d.y + "," + d.x + ")")
+    .on("click", (event, d) => {
+      // Toggle on click
+      if (d.children) {
+        d._children = d.children;
+        d.children = null;
+      } else if (d._children) {
+        d.children = d._children;
+        d._children = null;
+      }
+      update(d);
+    });
+
+  node.append("circle")
+    .attr("r", 6)
+    .style("fill", d => (d.children || d._children) ? "green" : "blue");
+
+  node.append("text")
+    .attr("dy", 3)
+    .attr("x", d => (d.children || d._children) ? -10 : 10)
+    .style("text-anchor", d => (d.children || d._children) ? "end" : "start")
+    .text(d => d.data.name);
+}
+
+// Helpers to collapse/expand recursively
+function collapse(d) {
+  if (d.children) {
+    d._children = d.children;
+    d.children = null;
+  }
+  if (d._children) {
+    d._children.forEach(collapse);
+  }
+}
+
+function expand(d) {
+  if (d._children) {
+    d.children = d._children;
+    d._children = null;
+  }
+  if (d.children) {
+    d.children.forEach(expand);
+  }
+}
+
+// Control buttons
+document.getElementById("expandAllBtn").addEventListener("click", () => {
+  expand(root);
+  update(root);
+});
+
+document.getElementById("collapseAllBtn").addEventListener("click", () => {
+  collapse(root);
+  update(root);
+});
+
+document.getElementById("resetZoomBtn").addEventListener("click", () => {
+  // Smooth reset to original transform
+  svg.transition()
+    .duration(500)
+    .call(zoom.transform, d3.zoomIdentity.translate(80,0));
+});
+
+// Initial draw
+update(root);
+</script>
+</body>
+</html>
